@@ -15,6 +15,7 @@ const UserListScreen = () => {
   }, []);
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Usuarios</Text>
       <FlatList
@@ -30,6 +31,7 @@ const UserListScreen = () => {
         )}
       />
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -37,6 +39,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FFF8', // para que combine con el fondo
   },
   title: {
     fontSize: 20,

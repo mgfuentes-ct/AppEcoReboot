@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Logo o imagen principal */}
+      
       <Image
         source={require('../img/logo-ecoreboot.png')} 
         style={styles.logo}
@@ -15,7 +15,6 @@ export default function WelcomeScreen({ navigation }) {
         Reciclamos, reparamos y donamos dispositivos electrónicos para un futuro más sostenible.
       </Text>
 
-      {/* Botones */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.buttonPrimary} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>

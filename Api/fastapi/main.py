@@ -25,9 +25,9 @@ donaciones = sqlalchemy.Table(
     "donaciones",
     metadata,
     sqlalchemy.Column("id_donacion", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("id_usuario", sqlalchemy.Integer),
-    sqlalchemy.Column("id_tipo_electrodomestico", sqlalchemy.Integer),
-    sqlalchemy.Column("id_estado_dispositivo", sqlalchemy.Integer),
+    sqlalchemy.Column("id_usuario", sqlalchemy.Integer, sqlalchemy.ForeignKey("usuarios.id_usuario")),
+    sqlalchemy.Column("id_tipo_electrodomestico", sqlalchemy.Integer, sqlalchemy.ForeignKey("tipo_electrodomestico.id_tipo_electrodomestico")),
+    sqlalchemy.Column("id_estado_dispositivo", sqlalchemy.Integer, sqlalchemy.ForeignKey("estado_dispositivo.id_estado_dispositivo")),
     sqlalchemy.Column("fecha", sqlalchemy.DateTime),
     sqlalchemy.Column("imperfecciones", sqlalchemy.String(255)),
     sqlalchemy.Column("telefono", sqlalchemy.String(20)),
@@ -42,7 +42,8 @@ usuarios = sqlalchemy.Table(
     sqlalchemy.Column("nombre", sqlalchemy.String(100)),
     sqlalchemy.Column("telefono", sqlalchemy.String(20)),
     sqlalchemy.Column("correo", sqlalchemy.String(100)),
-    sqlalchemy.Column("id_rol_usuario", sqlalchemy.Integer)
+    sqlalchemy.Column("id_rol_usuario", sqlalchemy.Integer),
+    sqlalchemy.Column("contraseña", sqlalchemy.String(255))
 )
 
 tipo_electrodomestico = sqlalchemy.Table(
@@ -692,3 +693,98 @@ async def listar_roles_usuarios():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+
+
+
+
+
+# ---------------------------
+# ENDPOINT DE LOGIN
+# ---------------------------
+class LoginData(BaseModel):
+    correo: str
+    password: str
+
+@app.post("/login", tags=["Autenticación"])
+async def login(data: LoginData):
+    query = select(
+        usuarios.c.id_usuario,
+        usuarios.c.nombre,
+        usuarios.c.correo,
+        usuarios.c.telefono,
+        usuarios.c.id_rol_usuario,
+        usuarios.c.contraseña,  # ✅ Añadido
+        rol_usuarios.c.nombre.label("rol_nombre")
+    ).select_from(
+        usuarios.join(rol_usuarios, usuarios.c.id_rol_usuario == rol_usuarios.c.id_rol_usuario)
+    ).where(usuarios.c.correo == data.correo)
+
+    user = await database.fetch_one(query)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
+
+    # ✅ Validar contraseña directamente (temporal, sin hash)
+    if data.password == user["contraseña"]:
+        return {
+            "id_usuario": user["id_usuario"],
+            "nombre": user["nombre"],
+            "rol": {"nombre": user["rol_nombre"]}
+        }
+
+    raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos")
+
+
+
+
+
+
+
+
+@app.get("/usuarios/{usuario_id}/donaciones", response_model=List[Donacion], tags=["Donaciones"])
+async def listar_donaciones_usuario(usuario_id: int):
+    query = select(
+        donaciones.c.id_donacion,
+        donaciones.c.id_usuario,
+        donaciones.c.id_tipo_electrodomestico,
+        donaciones.c.id_estado_dispositivo,
+        donaciones.c.fecha,
+        donaciones.c.imperfecciones,
+        donaciones.c.telefono,
+        donaciones.c.total_dispositivos,
+        donaciones.c.activo,
+        tipo_electrodomestico.c.nombre.label("tipo_nombre"),
+        estado_dispositivo.c.nombre.label("estado_nombre")
+    ).select_from(
+        donaciones.join(tipo_electrodomestico)
+                  .join(estado_dispositivo)
+    ).where(donaciones.c.id_usuario == usuario_id, donaciones.c.activo == True)
+    
+    rows = await database.fetch_all(query)
+    donaciones_list = []
+    for row in rows:
+        donacion = {
+            "id_donacion": row["id_donacion"],
+            "id_usuario": row["id_usuario"],
+            "id_tipo_electrodomestico": row["id_tipo_electrodomestico"],
+            "id_estado_dispositivo": row["id_estado_dispositivo"],
+            "fecha": row["fecha"],
+            "imperfecciones": row["imperfecciones"],
+            "telefono": row["telefono"],
+            "total_dispositivos": row["total_dispositivos"],
+            "activo": row["activo"],
+            "usuario": None,
+            "tipo": {
+                "id_tipo_electrodomestico": row["id_tipo_electrodomestico"],
+                "nombre": row["tipo_nombre"]
+            },
+            "estado": {
+                "id_estado_dispositivo": row["id_estado_dispositivo"],
+                "nombre": row["estado_nombre"]
+            }
+        }
+        donaciones_list.append(donacion)
+    return donaciones_list

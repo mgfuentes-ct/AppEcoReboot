@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getDevices } from '../api/api';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DeviceListScreen = () => {
   const [devices, setDevices] = useState([]);
@@ -15,6 +16,7 @@ const DeviceListScreen = () => {
   }, []);
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Dispositivos</Text>
       <FlatList
@@ -38,6 +40,7 @@ const DeviceListScreen = () => {
         )}
       />
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -45,6 +48,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FFF8', // para que combine con el fondo
   },
   title: {
     fontSize: 20,

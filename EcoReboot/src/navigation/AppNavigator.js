@@ -2,6 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -9,12 +11,14 @@ import HomeScreen from '../screens/HomeScreen';
 import DonationListScreen from '../screens/DonationListScreen';
 import DeviceListScreen from '../screens/DeviceListScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import DonationFormScreen from '../screens/DonationFormScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Tab Navigator para las pantallas principales
 function HomeTabs() {
+  const insets = useSafeAreaInsets(); //
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -43,48 +47,25 @@ function HomeTabs() {
           fontWeight: '600',
           marginBottom: 2,
         },
+        // Ajustamos dinámicamente el padding inferior según el sistema
         tabBarStyle: {
           backgroundColor: '#ffffff',
           borderTopWidth: 0.5,
           borderTopColor: '#ccc',
           elevation: 5,
-          height: 60, // más bajo que antes
-          paddingBottom: 5,
+          height: 60 + insets.bottom, // espacio extra
+          paddingBottom: 5 + insets.bottom,
           paddingTop: 5,
         },
         tabBarItemStyle: {
-          paddingVertical: 0, // sin relleno extra
+          paddingVertical: 0,
         },
       })}
     >
-      <Tab.Screen
-        name="Inicio"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: 'Inicio',
-        }}
-      />
-      <Tab.Screen
-        name="Donar"
-        component={DonationListScreen}
-        options={{
-          tabBarLabel: 'Donar',
-        }}
-      />
-      <Tab.Screen
-        name="Dispositivos"
-        component={DeviceListScreen}
-        options={{
-          tabBarLabel: 'Dispositivos',
-        }}
-      />
-      <Tab.Screen
-        name="Perfil"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Perfil',
-        }}
-      />
+      <Tab.Screen name="Inicio" component={HomeScreen} />
+      <Tab.Screen name="Donar" component={DonationListScreen} />
+      <Tab.Screen name="Dispositivos" component={DeviceListScreen} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -102,6 +83,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Iniciar Sesión' }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Crear Cuenta' }} />
       <Stack.Screen name="Home" component={HomeTabs} options={{ headerShown: false }} />
+      <Stack.Screen name="DonationForm" component={DonationFormScreen} options={{ title: 'Nueva Donación' }} />
     </Stack.Navigator>
   );
 }

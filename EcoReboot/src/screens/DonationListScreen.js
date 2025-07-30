@@ -1,75 +1,200 @@
 // src/screens/DonationListScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { getDonations } from '../api/api';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_URL } from '../api/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const DonationListScreen = () => {
+const DonationListScreen = ({ navigation }) => {
   const [donations, setDonations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Función para obtener el ID del usuario logueado
+  const getUserId = async () => {
+    const id = await AsyncStorage.getItem('userId');
+    return id ? parseInt(id) : null;
+  };
+
+  // Función para cargar las donaciones del usuario
+  const fetchUserDonations = async () => {
+    try {
+      const userId = await getUserId();
+      if (!userId) {
+        console.log('No hay usuario autenticado');
+        setDonations([]);
+        return;
+      }
+
+      const response = await axios.get(`${API_URL}/usuarios/${userId}/donaciones`);
+      setDonations(response.data);
+    } catch (error) {
+      console.error('Error al cargar donaciones del usuario:', error);
+      // Puedes mostrar un mensaje de error en pantalla si lo deseas
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDonations = async () => {
-      const data = await getDonations();
-      setDonations(data);
-    };
-    fetchDonations();
+    fetchUserDonations();
   }, []);
 
+  // Función para refrescar la lista
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchUserDonations();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Lista de Donaciones</Text>
-      <FlatList
-        data={donations}
-        keyExtractor={(item) => item.id_donacion.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.donationItem}>
-            <Text style={styles.donationTitle}>
-              Donación #{item.id_donacion}
-            </Text>
-            <Text style={styles.donationDetail}>
-              Usuario: {item.usuario?.nombre}
-            </Text>
-            <Text style={styles.donationDetail}>
-              Tipo: {item.tipo?.nombre}
-            </Text>
-            <Text style={styles.donationDetail}>
-              Estado: {item.estado?.nombre}
-            </Text>
-            <Text style={styles.donationDetail}>
-              Fecha: {item.fecha.toISOString().split('T')[0]}
-            </Text>
-            <Text style={styles.donationDetail}>
-              Total Dispositivos: {item.total_dispositivos}
-            </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Mis Donaciones</Text>
+
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Cargando donaciones...</Text>
           </View>
+        ) : (
+          <FlatList
+            data={donations}
+            keyExtractor={(item) => item.id_donacion.toString()}
+            renderItem={({ item, index }) => (
+              <View style={styles.donationItem}>
+                <Text style={styles.donationTitle}>Donación #{index + 1}</Text>
+                <Text style={styles.donationDetail}>Tipo: {item.tipo?.nombre}</Text>
+                <Text style={styles.donationDetail}>Estado: {item.estado?.nombre}</Text>
+                <Text style={styles.donationDetail}>
+                  Fecha: {item.fecha ? new Date(item.fecha).toISOString().split('T')[0] : 'Sin fecha'}
+                </Text>
+                <Text style={styles.donationDetail}>
+                  Total Dispositivos: {item.total_dispositivos}
+                </Text>
+              </View>
+            )}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Aún no has donado ningún dispositivo.</Text>
+                <TouchableOpacity
+                  style={styles.ctaButton}
+                  onPress={() => navigation.navigate('DonationForm')}
+                >
+                  <Text style={styles.ctaButtonText}>¡Haz tu primera donación!</Text>
+                </TouchableOpacity>
+              </View>
+            }
+            contentContainerStyle={styles.listContainer}
+            onRefresh={handleRefresh}
+            refreshing={loading}
+          />
+
         )}
-      />
-    </View>
+
+        {/* Botón para donar */}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('DonationForm')}
+        >
+          <Text style={styles.addButtonText}>Donar nuevo dispositivo</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FFF8',
+  },
   container: {
     flex: 1,
-    padding: 20,
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 80,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#11A140',
     marginBottom: 20,
+    textAlign: 'center',
   },
   donationItem: {
-    backgroundColor: '#cfe2ff',
-    padding: 15,
-    marginVertical: 8,
-    borderRadius: 10,
+    backgroundColor: '#E8F5E8',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   donationTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#11A140',
+    marginBottom: 6,
   },
   donationDetail: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
+    marginBottom: 4,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#666',
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  ctaButton: {
+    backgroundColor: '#11A140',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  ctaButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#666',
+    fontSize: 16,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#11A140',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

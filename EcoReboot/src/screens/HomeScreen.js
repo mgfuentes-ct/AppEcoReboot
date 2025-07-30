@@ -1,4 +1,4 @@
-// src/screens/HomeScreen.js
+
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        {/* Banner superior */}
+       
         <View style={styles.banner}>
           <Text style={styles.bannerTitle}>BIENVENIDO A ECOREBOOT</Text>
           <Text style={styles.bannerText}>
@@ -16,7 +16,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
         </View>
 
-        {/* Sección Acerca de nosotros */}
+        
         <View style={styles.aboutSection}>
           <Text style={styles.aboutTitle}>ACERCA DE NOSOTROS</Text>
           <View style={styles.aboutContent}>
@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }) {
     />
         </View>
 
-        {/* Sección de dispositivos */}
+      
         <View style={styles.devicesSection}>
           <View style={styles.deviceItem}>
             <Image source={require('../img/laptop.png')} style={styles.deviceIcon} />
