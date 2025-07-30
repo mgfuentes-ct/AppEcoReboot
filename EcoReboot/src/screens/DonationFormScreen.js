@@ -1,16 +1,18 @@
 // src/screens/DonationFormScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-
-// Simulamos que el usuario está logueado (en tu caso, deberás obtenerlo del contexto o AsyncStorage)
-const userId = 3; // ← Reemplaza con el ID real del usuario logueado
+import { API_URL } from '../api/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function DonationFormScreen({ navigation }) {
   const [telefono, setTelefono] = useState('');
   const [imperfecciones, setImperfecciones] = useState('');
   const [totalDispositivos, setTotalDispositivos] = useState('');
-  const [idTipo, setIdTipo] = useState('1'); // Laptop
-  const [idEstado, setIdEstado] = useState('1'); // Funcional
+  const [idTipo, setIdTipo] = useState(null); // Inicialmente nulo
+  const [idEstado, setIdEstado] = useState(null); // Inicialmente nulo
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   // Tipos y estados (puedes cargarlos desde la API si lo prefieres)
   const tipos = [
@@ -25,31 +27,65 @@ export default function DonationFormScreen({ navigation }) {
     { id: '2', nombre: 'Defectuoso' },
   ];
 
+  // Obtener el ID del usuario al cargar
+  useEffect(() => {
+    const loadUserId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      if (id) {
+        setUserId(parseInt(id));
+      } else {
+        Alert.alert('Error', 'No has iniciado sesión');
+        navigation.goBack();
+      }
+    };
+    loadUserId();
+  }, []);
+
   const handleSubmit = async () => {
-    if (!telefono || !totalDispositivos) {
-      Alert.alert('Error', 'Por favor completa los campos obligatorios');
+    if (!userId) {
+      Alert.alert('Error', 'No se pudo obtener el usuario');
+      return;
+    }
+
+    if (!telefono || !totalDispositivos || !idTipo || !idEstado) {
+      Alert.alert('Error', 'Por favor completa todos los campos obligatorios');
       return;
     }
 
     const donacionData = {
-      id_tipo_electrodomestico: parseInt(idTipo),
-      id_estado_dispositivo: parseInt(idEstado),
-      fecha: new Date().toISOString(), // Fecha actual
-      imperfecciones: imperfecciones || null,
-      telefono,
-      total_dispositivos: parseInt(totalDispositivos),
-    };
+  id_tipo_electrodomestico: parseInt(idTipo),
+  id_estado_dispositivo: parseInt(idEstado),
+  fecha: new Date().toISOString().split('T')[0], // "2025-07-30"
+  imperfecciones: imperfecciones || null,
+  telefono,
+  total_dispositivos: parseInt(totalDispositivos),
+};
+
+    setLoading(true);
 
     try {
-      // Aquí iría la llamada a tu API
-      console.log('Enviando donación:', donacionData);
+      const response = await axios.post(
+        `${API_URL}/usuarios/${userId}/donaciones`,
+        donacionData
+      );
 
-      // Simulamos éxito
       Alert.alert('Éxito', 'Donación registrada correctamente');
-      navigation.goBack(); // Volver a la lista
+      setTelefono('');
+      setImperfecciones('');
+      setTotalDispositivos('');
+      setIdTipo(null);
+      setIdEstado(null);
+
+      // Volver a la lista de donaciones
+      navigation.navigate('Donar'); // Asegúrate que el nombre coincida
     } catch (error) {
-      Alert.alert('Error', 'No se pudo registrar la donación');
-      console.error(error);
+      console.error('Error al registrar donación:', error.response?.data || error.message);
+      Alert.alert(
+        'Error',
+        error.response?.data?.detail || 'No se pudo registrar la donación'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,9 +163,15 @@ export default function DonationFormScreen({ navigation }) {
         keyboardType="numeric"
       />
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Registrar Donación</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <View style={styles.submitButton}>
+          <Text style={styles.submitButtonText}>Registrando...</Text>
+        </View>
+      ) : (
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Registrar Donación</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -183,7 +225,6 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: '#333',
-
   },
   optionTextSelected: {
     color: '#11A140',

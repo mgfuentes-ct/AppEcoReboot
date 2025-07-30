@@ -64,7 +64,7 @@ function HomeTabs() {
     >
       <Tab.Screen name="Inicio" component={HomeScreen} />
       <Tab.Screen name="Donar" component={DonationListScreen} />
-      <Tab.Screen name="Dispositivos" component={DeviceListScreen} />
+      {/*<Tab.Screen name="Dispositivos" component={DonationFormScreen} />*/}
       <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );

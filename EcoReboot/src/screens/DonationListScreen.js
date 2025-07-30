@@ -10,13 +10,11 @@ const DonationListScreen = ({ navigation }) => {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Función para obtener el ID del usuario logueado
   const getUserId = async () => {
     const id = await AsyncStorage.getItem('userId');
     return id ? parseInt(id) : null;
   };
 
-  // Función para cargar las donaciones del usuario
   const fetchUserDonations = async () => {
     try {
       const userId = await getUserId();
@@ -26,25 +24,40 @@ const DonationListScreen = ({ navigation }) => {
         return;
       }
 
+      console.log('Obteniendo donaciones para usuario:', userId);
+
       const response = await axios.get(`${API_URL}/usuarios/${userId}/donaciones`);
-      setDonations(response.data);
+      
+      console.log('Respuesta completa:', response); // 🔥 Verifica status y data
+      console.log('Donaciones recibidas:', response.data); // 🔥 Verifica los datos
+
+      if (response.data && Array.isArray(response.data)) {
+        setDonations(response.data);
+      } else {
+        console.log('La respuesta no es un array:', response.data);
+        setDonations([]);
+      }
     } catch (error) {
-      console.error('Error al cargar donaciones del usuario:', error);
-      // Puedes mostrar un mensaje de error en pantalla si lo deseas
+      console.error('Error al cargar donaciones:', error.response?.data || error.message);
+      console.error('Error completo:', error); // 🔥 Muestra todo el error
+      setDonations([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUserDonations();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('Pantalla enfocada: recargando donaciones...');
+      setLoading(true);
+      fetchUserDonations();
+    });
 
-  // Función para refrescar la lista
-  const handleRefresh = () => {
-    setLoading(true);
+    // Cargar al montar
     fetchUserDonations();
-  };
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -54,6 +67,16 @@ const DonationListScreen = ({ navigation }) => {
         {loading ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Cargando donaciones...</Text>
+          </View>
+        ) : donations.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Aún no has donado ningún dispositivo.</Text>
+            <TouchableOpacity
+              style={styles.ctaButton}
+              onPress={() => navigation.navigate('DonationForm')}
+            >
+              <Text style={styles.ctaButtonText}>¡Haz tu primera donación!</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <FlatList
@@ -72,25 +95,10 @@ const DonationListScreen = ({ navigation }) => {
                 </Text>
               </View>
             )}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>Aún no has donado ningún dispositivo.</Text>
-                <TouchableOpacity
-                  style={styles.ctaButton}
-                  onPress={() => navigation.navigate('DonationForm')}
-                >
-                  <Text style={styles.ctaButtonText}>¡Haz tu primera donación!</Text>
-                </TouchableOpacity>
-              </View>
-            }
             contentContainerStyle={styles.listContainer}
-            onRefresh={handleRefresh}
-            refreshing={loading}
           />
-
         )}
 
-        {/* Botón para donar */}
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.navigate('DonationForm')}

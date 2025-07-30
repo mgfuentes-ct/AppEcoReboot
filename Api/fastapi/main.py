@@ -748,7 +748,7 @@ async def login(data: LoginData):
 async def listar_donaciones_usuario(usuario_id: int):
     query = select(
         donaciones.c.id_donacion,
-        donaciones.c.id_usuario,
+        donaciones.c.id_usuario,  # ✅ Añadido
         donaciones.c.id_tipo_electrodomestico,
         donaciones.c.id_estado_dispositivo,
         donaciones.c.fecha,
@@ -768,7 +768,7 @@ async def listar_donaciones_usuario(usuario_id: int):
     for row in rows:
         donacion = {
             "id_donacion": row["id_donacion"],
-            "id_usuario": row["id_usuario"],
+            "id_usuario": row["id_usuario"],  # ✅ Ahora existe
             "id_tipo_electrodomestico": row["id_tipo_electrodomestico"],
             "id_estado_dispositivo": row["id_estado_dispositivo"],
             "fecha": row["fecha"],
