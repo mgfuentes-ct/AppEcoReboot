@@ -1,4 +1,3 @@
-// src/screens/LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { API_URL } from '../api/config';
@@ -19,7 +18,6 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
 
     try {
-      // 🔥 Llamada a tu API FastAPI
       const response = await axios.post(`${API_URL}/login`, {
         correo,
         password,
@@ -27,11 +25,12 @@ export default function LoginScreen({ navigation }) {
 
       const { id_usuario, nombre, rol } = response.data;
 
-      // ✅ Guardar datos del usuario en AsyncStorage
-      await AsyncStorage.setItem('userToken', 'loggedin'); // Token simple
+      await AsyncStorage.setItem('userToken', 'loggedin'); 
       await AsyncStorage.setItem('userId', id_usuario.toString());
       await AsyncStorage.setItem('userName', nombre);
       await AsyncStorage.setItem('userRole', rol?.nombre || 'Usuario');
+      await AsyncStorage.setItem('userCorreo', correo);
+      await AsyncStorage.setItem('userRole2', response.data.rol.nombre);
 
       Alert.alert('Éxito', `Bienvenido, ${nombre}`);
       navigation.replace('Home');

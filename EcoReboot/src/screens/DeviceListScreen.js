@@ -1,4 +1,4 @@
-// src/screens/DeviceListScreen.js
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getDevices } from '../api/api';
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FFF8', // para que combine con el fondo
+    backgroundColor: '#F8FFF8',
   },
   title: {
     fontSize: 20,

@@ -23,17 +23,16 @@ export default function HomeScreen({ navigation }) {
             
             <Text style={styles.aboutText}>
               ¡Dale una segunda vida a tus dispositivos electrónicos! En EcoReboot creemos en el poder del reciclaje,
-              la reutilización y la reparación para reducir el impacto ambiental de la tecnología. {"\n\n"}
+              la reutilización y la reparación para reducir el impacto ambiental de la tecnología.{"\n\n"}
               ¿Tienes computadoras, celulares, tablets o impresoras en desuso? Aquí puedes donarlos, repararlos o encontrar
               dispositivos reacondicionados listos para un nuevo hogar. {"\n\n"}
               Juntos, construimos un futuro más sostenible.{"\n"}
             </Text>
           </View>
           <Image
-      source={require('../img/demostracion.png')}
-      style={[styles.aboutImage]} // deja un margen opcional
-       // o "cover" si quieres que rellene
-    />
+            source={require('../img/demostracion.png')}
+            style={[styles.aboutImage]}
+          />
         </View>
 
       
@@ -67,7 +66,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FFF8', // para que combine con el fondo
+    backgroundColor: '#F8FFF8', 
   },
   container: {
     flex: 1,

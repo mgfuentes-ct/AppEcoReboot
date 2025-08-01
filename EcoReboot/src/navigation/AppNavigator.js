@@ -1,3 +1,4 @@
+// src/navigation/AppNavigator.js
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,12 +13,19 @@ import DonationListScreen from '../screens/DonationListScreen';
 import DeviceListScreen from '../screens/DeviceListScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import DonationFormScreen from '../screens/DonationFormScreen';
+import AdminDashboardScreen from '../screens/Admin/AdminDashboardScreen';
+import UserListScreen from '../screens/Admin/UserListScreen';
+import UserFormScreen from '../screens/Admin/UserFormScreen';
+import AllDonationsScreen from '../screens/Admin/AllDonationsScreen';
+import DonationTabScreen from '../screens/DonationTabScreen';
+import InstitutionListScreen from '../screens/Admin/InstitutionListScreen';
+import InstitutionFormScreen from '../screens/Admin/InstitutionFormScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function HomeTabs() {
-  const insets = useSafeAreaInsets(); //
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -47,13 +55,12 @@ function HomeTabs() {
           fontWeight: '600',
           marginBottom: 2,
         },
-        // Ajustamos dinámicamente el padding inferior según el sistema
         tabBarStyle: {
           backgroundColor: '#ffffff',
           borderTopWidth: 0.5,
           borderTopColor: '#ccc',
           elevation: 5,
-          height: 60 + insets.bottom, // espacio extra
+          height: 60 + insets.bottom,
           paddingBottom: 5 + insets.bottom,
           paddingTop: 5,
         },
@@ -63,11 +70,12 @@ function HomeTabs() {
       })}
     >
       <Tab.Screen name="Inicio" component={HomeScreen} />
-      <Tab.Screen name="Donar" component={DonationListScreen} />
-      {/*<Tab.Screen name="Dispositivos" component={DonationFormScreen} />*/}
+      <Tab.Screen name="Donar" component={DonationTabScreen} />
+
       <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );
+
 }
 
 export default function AppNavigator() {
@@ -84,6 +92,12 @@ export default function AppNavigator() {
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Crear Cuenta' }} />
       <Stack.Screen name="Home" component={HomeTabs} options={{ headerShown: false }} />
       <Stack.Screen name="DonationForm" component={DonationFormScreen} options={{ title: 'Nueva Donación' }} />
+      <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ title: 'Panel de Admin' }} />
+      <Stack.Screen name="UserList" component={UserListScreen} options={{ title: 'Usuarios' }} />
+      <Stack.Screen name="UserForm" component={UserFormScreen} options={{ title: 'Usuario' }} />
+      <Stack.Screen name="AllDonations" component={AllDonationsScreen} options={{ title: 'Todas las Donaciones' }} />
+      <Stack.Screen name="InstitutionList" component={InstitutionListScreen} options={{ title: 'Instituciones' }} />
+      <Stack.Screen name="InstitutionForm" component={InstitutionFormScreen} options={{ title: 'Institución' }} />
     </Stack.Navigator>
   );
 }

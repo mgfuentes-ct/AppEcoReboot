@@ -1,4 +1,4 @@
-// src/screens/DonationFormScreen.js
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { API_URL } from '../api/config';
@@ -9,12 +9,11 @@ export default function DonationFormScreen({ navigation }) {
   const [telefono, setTelefono] = useState('');
   const [imperfecciones, setImperfecciones] = useState('');
   const [totalDispositivos, setTotalDispositivos] = useState('');
-  const [idTipo, setIdTipo] = useState(null); // Inicialmente nulo
-  const [idEstado, setIdEstado] = useState(null); // Inicialmente nulo
+  const [idTipo, setIdTipo] = useState(null); 
+  const [idEstado, setIdEstado] = useState(null); 
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
 
-  // Tipos y estados (puedes cargarlos desde la API si lo prefieres)
   const tipos = [
     { id: '1', nombre: 'Laptop' },
     { id: '2', nombre: 'PC' },
@@ -27,7 +26,6 @@ export default function DonationFormScreen({ navigation }) {
     { id: '2', nombre: 'Defectuoso' },
   ];
 
-  // Obtener el ID del usuario al cargar
   useEffect(() => {
     const loadUserId = async () => {
       const id = await AsyncStorage.getItem('userId');
@@ -55,7 +53,7 @@ export default function DonationFormScreen({ navigation }) {
     const donacionData = {
   id_tipo_electrodomestico: parseInt(idTipo),
   id_estado_dispositivo: parseInt(idEstado),
-  fecha: new Date().toISOString().split('T')[0], // "2025-07-30"
+  fecha: new Date().toISOString().split('T')[0], 
   imperfecciones: imperfecciones || null,
   telefono,
   total_dispositivos: parseInt(totalDispositivos),
@@ -76,8 +74,7 @@ export default function DonationFormScreen({ navigation }) {
       setIdTipo(null);
       setIdEstado(null);
 
-      // Volver a la lista de donaciones
-      navigation.navigate('Donar'); // Asegúrate que el nombre coincida
+      navigation.navigate('Donar'); 
     } catch (error) {
       console.error('Error al registrar donación:', error.response?.data || error.message);
       Alert.alert(
@@ -181,6 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#F8FFF8',
+    marginBottom: 30,
   },
   title: {
     fontSize: 20,
@@ -241,6 +239,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 30,
   },
   submitButtonText: {
     color: '#fff',

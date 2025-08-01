@@ -1,4 +1,3 @@
-// src/screens/DonationListScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,9 +26,9 @@ const DonationListScreen = ({ navigation }) => {
       console.log('Obteniendo donaciones para usuario:', userId);
 
       const response = await axios.get(`${API_URL}/usuarios/${userId}/donaciones`);
-      
-      console.log('Respuesta completa:', response); // 🔥 Verifica status y data
-      console.log('Donaciones recibidas:', response.data); // 🔥 Verifica los datos
+
+      console.log('Respuesta completa:', response);
+      console.log('Donaciones recibidas:', response.data);
 
       if (response.data && Array.isArray(response.data)) {
         setDonations(response.data);
@@ -39,7 +38,7 @@ const DonationListScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.error('Error al cargar donaciones:', error.response?.data || error.message);
-      console.error('Error completo:', error); // 🔥 Muestra todo el error
+      console.error('Error completo:', error); 
       setDonations([]);
     } finally {
       setLoading(false);
@@ -53,7 +52,7 @@ const DonationListScreen = ({ navigation }) => {
       fetchUserDonations();
     });
 
-    // Cargar al montar
+
     fetchUserDonations();
 
     return unsubscribe;
