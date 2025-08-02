@@ -50,8 +50,8 @@ export default function RegisterScreen({ navigation }) {
         nombre,
         telefono,
         correo: trimmedEmail,
-        contrasena: trimmedPassword,
-        id_rol_usuario: 3, // Rol fijo para donadores
+        contraseña: trimmedPassword, // <-- usa la ñ como se espera en el backend
+        id_rol_usuario: 3,
       });
 
       Alert.alert('Éxito', 'Usuario registrado correctamente');

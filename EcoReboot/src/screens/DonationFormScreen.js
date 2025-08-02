@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { API_URL } from '../api/config';
@@ -62,10 +61,8 @@ export default function DonationFormScreen({ navigation }) {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${API_URL}/usuarios/${userId}/donaciones`,
-        donacionData
-      );
+      const response = await axios.post(`${API_URL}/donaciones/usuario/${userId}`, donacionData);
+
 
       Alert.alert('Éxito', 'Donación registrada correctamente');
       setTelefono('');
@@ -74,7 +71,7 @@ export default function DonationFormScreen({ navigation }) {
       setIdTipo(null);
       setIdEstado(null);
 
-      navigation.navigate('Donar'); 
+      navigation.navigate('Home', { screen: 'Donar' }); 
     } catch (error) {
       console.error('Error al registrar donación:', error.response?.data || error.message);
       Alert.alert(

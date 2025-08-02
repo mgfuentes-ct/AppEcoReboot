@@ -25,7 +25,7 @@ const DonationListScreen = ({ navigation }) => {
 
       console.log('Obteniendo donaciones para usuario:', userId);
 
-      const response = await axios.get(`${API_URL}/usuarios/${userId}/donaciones`);
+      const response = await axios.get(`${API_URL}/donaciones/usuario/${userId}`);
 
       console.log('Respuesta completa:', response);
       console.log('Donaciones recibidas:', response.data);
