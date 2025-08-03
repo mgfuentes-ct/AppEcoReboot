@@ -1,5 +1,7 @@
 // src/screens/Admin/InstitutionFormScreen.js
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_URL } from '../../api/config';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 export default function InstitutionFormScreen({ route, navigation }) {
@@ -27,16 +29,17 @@ export default function InstitutionFormScreen({ route, navigation }) {
 
     try {
       if (isEditing) {
-        await axios.put(`${API_URL}/instituciones/${institution.id_institucion}`, data);
+        const res = await axios.put(`${API_URL}/instituciones/${institution.id_institucion}`, data);
+        console.log('Respuesta PUT:', res.data);
       } else {
-        await axios.post(`${API_URL}/instituciones/`, data);
+        const res = await axios.post(`${API_URL}/instituciones/`, data);
+        console.log('Respuesta POST:', res.data);
       }
       navigation.goBack();
       Alert.alert('Éxito', `Institución ${isEditing ? 'actualizada' : 'creada'} correctamente`);
     } catch (error) {
+      console.error('Error al guardar institución:', error.response?.data || error.message);
       Alert.alert('Error', `No se pudo ${isEditing ? 'editar' : 'crear'} la institución`);
-    } finally {
-      setLoading(false);
     }
   };
 

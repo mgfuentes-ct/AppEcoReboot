@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { API_URL } from '../../api/config';
 import axios from 'axios';
@@ -11,11 +11,12 @@ export default function UserFormScreen({ route, navigation }) {
   const [telefono, setTelefono] = useState(user?.telefono || '');
   const [correo, setCorreo] = useState(user?.correo || '');
   const [idRol, setIdRol] = useState(user?.id_rol_usuario?.toString() || '2');
+  const [contrasena, setContrasena] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!nombre || !telefono || !correo || !idRol) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
+    if (!nombre || !telefono || !correo || !idRol || (!isEditing && !contrasena)) {
+      Alert.alert('Error', 'Por favor completa todos los campos obligatorios');
       return;
     }
 
@@ -24,6 +25,7 @@ export default function UserFormScreen({ route, navigation }) {
       telefono,
       correo,
       id_rol_usuario: parseInt(idRol),
+      ...(isEditing ? {} : { contraseña: contrasena }), // solo agregar contraseña si es nuevo
     };
 
     setLoading(true);
@@ -34,9 +36,10 @@ export default function UserFormScreen({ route, navigation }) {
       } else {
         await axios.post(`${API_URL}/usuarios/`, userData);
       }
-      navigation.goBack();
       Alert.alert('Éxito', `Usuario ${isEditing ? 'actualizado' : 'creado'} correctamente`);
+      navigation.goBack();
     } catch (error) {
+      console.error(error.response?.data || error.message);
       Alert.alert('Error', `No se pudo ${isEditing ? 'editar' : 'crear'} el usuario`);
     } finally {
       setLoading(false);
@@ -68,6 +71,18 @@ export default function UserFormScreen({ route, navigation }) {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
+      {/* Campo de contraseña solo si es creación */}
+      {!isEditing && (
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
+          value={contrasena}
+          onChangeText={setContrasena}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+      )}
 
       <Text style={styles.label}>Rol</Text>
       <View style={styles.radioGroup}>
