@@ -42,19 +42,19 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.deviceText}>Laptops</Text>
           </View>
           <View style={styles.deviceItem}>
-            <Image source={require('../img/laptop.png')} style={styles.deviceIcon} />
+            <Image source={require('../img/tableta-grafica.png')} style={styles.deviceIcon} />
             <Text style={styles.deviceText}>Tabletas</Text>
           </View>
           <View style={styles.deviceItem}>
-            <Image source={require('../img/laptop.png')} style={styles.deviceIcon} />
+            <Image source={require('../img/monitor.png')} style={styles.deviceIcon} />
             <Text style={styles.deviceText}>Monitores</Text>
           </View>
           <View style={styles.deviceItem}>
-            <Image source={require('../img/laptop.png')} style={styles.deviceIcon} />
+            <Image source={require('../img/ordenador-personal.png')} style={styles.deviceIcon} />
             <Text style={styles.deviceText}>PC</Text>
           </View>
           <View style={styles.deviceItem}>
-            <Image source={require('../img/laptop.png')} style={styles.deviceIcon} />
+            <Image source={require('../img/teclado.png')} style={styles.deviceIcon} />
             <Text style={styles.deviceText}>Teclados</Text>
           </View>
         </View>
